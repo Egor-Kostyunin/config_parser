@@ -1,6 +1,7 @@
 #ifndef CONFIG_PARSER_H
 #define CONFIG_PARSER_H
 
+#define MAX_STR_SIZE 512
 #define MAX_VALUE_STR_SIZE 512
 #define MAX_SECTION_NAME_SIZE 512
 #define  MAX_VARIABLE_NAME_SIZE 512
@@ -18,6 +19,5 @@ typedef struct config_struct {
 } config;
 
 config* ReadConfg(char *file_path);
-values_list* ParseValuesString(char *values_string);
 values_list* GetConfigValues(confg *config_ptr, char *section_name, char *variable_name);
 #endif
