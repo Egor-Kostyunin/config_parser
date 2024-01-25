@@ -8,7 +8,7 @@
 
 typedef struct  values_list_struct {
 	char valueString[MAX_VALUE_STR_SIZE];
-	struct values_vector_struct *next;
+	struct values_list_struct *next;
 } values_list;
 
 typedef struct config_struct {
@@ -18,6 +18,6 @@ typedef struct config_struct {
 	struct config_struct *next;
 } config;
 
-config* ReadConfg(char *file_path);
-values_list* GetConfigValues(confg *config_ptr, char *section_name, char *variable_name);
+config* ReadConfig(char *file_path);
+values_list* GetConfigValues(config *config_ptr, char *section_name, char *variable_name);
 #endif
