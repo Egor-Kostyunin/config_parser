@@ -27,6 +27,21 @@ char trim(char *buffer){
 	return 1;
 }
 
+char rtrim(char *buffer){
+	int offset = strlen(buffer)-1;
+	if(offset == 0) return 0;
+
+	while(offset > 0 && strchr(" \t\n",buffer[offset]) != NULL) {
+		offset--;
+	}
+
+	if(offset == 0) return 0;
+	
+	buffer[offset + 1] = '\0';
+
+	return 1;
+}
+
 config* ReadConfig(char *file_path) {
 
 	FILE *configFile = fopen(file_path, "r");
@@ -84,23 +99,8 @@ config* ReadConfig(char *file_path) {
 			
 			strcpy(current->variableName,line);
 			
-			//Костыли по обрезанию лишних символов в конце строки
-			char *endline = strchr(current->sectionName,'\n');
-			if(endline != NULL){
-				*endline = '\0';
-			}
-			endline = strrchr(current->sectionName,' ');
-			if(endline != NULL){
-				*endline = '\0';
-			}
-			endline = strchr(current->variableName,'\n');
-			if(endline != NULL){
-				*endline = '\0';
-			}
-			endline = strrchr(current->variableName,' ');
-			if(endline != NULL){
-				*endline = '\0';
-			}
+			rtrim(current->sectionName);
+			rtrim(current->variableName);
 
 			char *varValuesLine = strtok(NULL,"~;");
 
