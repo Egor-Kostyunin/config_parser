@@ -3,6 +3,30 @@
 #include <stdlib.h>
 #include <string.h>
 
+char trim(char *buffer){
+	int buffer_length = strlen(buffer);
+	int offset = 0;
+	if(buffer_length == 0 || buffer[0] == '\n') return 0;
+
+	while(offset < buffer_length && strchr(" \t",buffer[offset]) != NULL) {
+		offset++;
+	}
+
+	if(offset == buffer_length) return 0;
+
+	if(offset > 0) {
+
+		for(int i = 0; i < buffer_length; i++) {
+			buffer[i] = buffer[i + offset];
+		}
+
+	}
+
+	buffer[buffer_length - offset] = '\0';
+
+	return 1;
+}
+
 config* ReadConfig(char *file_path) {
 
 	FILE *configFile = fopen(file_path, "r");
@@ -18,30 +42,14 @@ config* ReadConfig(char *file_path) {
 	while(feof(configFile) == 0) {
 		char buffer[MAX_STR_SIZE];
 
+		//Чтение строки
 		if(fgets(buffer, MAX_STR_SIZE, configFile) == NULL && ferror(configFile) != 0) {
 			perror("Ошибка чтения файла конфигурации");
 			exit(2);
 		}
 		if(feof(configFile) != 0) return begin;
 
-		int buffer_length = strlen(buffer);
-		int offset = 0;
-		if(buffer_length == 0 || buffer[0] == '\n') continue;
-
-		while(offset < buffer_length && strchr(" \t",buffer[offset]) != NULL) {
-			offset++;
-		}
-
-		if(offset == buffer_length) continue;
-
-		if(offset > 0) {
-
-			for(int i = 0; i < buffer_length; i++) {
-				buffer[i] = buffer[i + offset];
-			}
-		}
-
-		buffer[buffer_length - offset] = '\0';
+		if(!trim(buffer)) continue;
 		
 
 		if(strchr("#!~;",buffer[0]) != NULL) continue;
@@ -52,7 +60,7 @@ config* ReadConfig(char *file_path) {
 			perror("strtok 1 is null");
 			exit(3);
 		}
-
+		//Смена секции
 		if(line[0] == '['){
 			free(sectionName);
 			sectionName = strdup(line);
@@ -62,7 +70,7 @@ config* ReadConfig(char *file_path) {
 			}		
 		}
 		else{
-
+			//Чтение переменных секции 
 			if(begin == NULL) {
 				current = begin = (config*)calloc(1,sizeof(config));
 			}
@@ -73,6 +81,10 @@ config* ReadConfig(char *file_path) {
 			}
 
 			strcpy(current->sectionName,sectionName);
+			
+			strcpy(current->variableName,line);
+			
+			//Костыли по обрезанию лишних символов в конце строки
 			char *endline = strchr(current->sectionName,'\n');
 			if(endline != NULL){
 				*endline = '\0';
@@ -81,8 +93,6 @@ config* ReadConfig(char *file_path) {
 			if(endline != NULL){
 				*endline = '\0';
 			}
-			strcpy(current->variableName,line);
-			
 			endline = strchr(current->variableName,'\n');
 			if(endline != NULL){
 				*endline = '\0';
@@ -116,7 +126,7 @@ config* ReadConfig(char *file_path) {
 					perror("Не удалось выделить память под элемент листа");
 					exit(6);
 				}
-
+				trim(varValue);
 				strcpy(vl->valueString,varValue);
 			}
 
