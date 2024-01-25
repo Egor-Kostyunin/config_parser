@@ -127,6 +127,7 @@ config* ReadConfig(char *file_path) {
 					exit(6);
 				}
 				trim(varValue);
+				rtrim(varValue);
 				strcpy(vl->valueString,varValue);
 			}
 
