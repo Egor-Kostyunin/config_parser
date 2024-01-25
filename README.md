@@ -4,7 +4,7 @@
 make config_parser
 ```
 ## Пример
-```С
+```c
 #include "config_parser.h"
 #include <stdio.h>
 
