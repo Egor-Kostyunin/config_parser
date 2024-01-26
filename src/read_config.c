@@ -32,12 +32,11 @@ char rtrim(char *buffer){
 	if(offset == 0) return 0;
 
 	while(offset > 0 && strchr(" \t\n",buffer[offset]) != NULL) {
+		buffer[offset] = '\0';
 		offset--;
 	}
 
 	if(offset == 0) return 0;
-	
-	buffer[offset + 1] = '\0';
 
 	return 1;
 }
@@ -62,15 +61,15 @@ config* ReadConfig(char *file_path) {
 			perror("Ошибка чтения файла конфигурации");
 			exit(2);
 		}
+		
 		if(feof(configFile) != 0) return begin;
 
 		if(!trim(buffer)) continue;
 		
-
 		if(strchr("#!~;",buffer[0]) != NULL) continue;
 
 		char *line = strtok(buffer,"~;=");
-
+		
 		if(line == NULL){
 			perror("strtok 1 is null");
 			exit(3);
@@ -78,11 +77,23 @@ config* ReadConfig(char *file_path) {
 		//Смена секции
 		if(line[0] == '['){
 			free(sectionName);
+			sectionName = NULL;
 			sectionName = strdup(line);
 			if(sectionName == NULL){
 				perror("sectionName is null");
 				exit(3);
-			}		
+			}
+	
+			char *o = strchr(sectionName,'[');
+			char *c = strchr(sectionName,']');
+			if(o == NULL || c == NULL){
+				perror("not sectionName");
+				exit(3);
+			}
+			*o = ' ';
+			*c = ' ';
+			trim(sectionName);
+			rtrim(sectionName);
 		}
 		else{
 			//Чтение переменных секции 

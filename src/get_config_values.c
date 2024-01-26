@@ -7,5 +7,6 @@ values_list* GetConfigValues(config *config_ptr, char *section_name, char *varia
 			return current->variableValues;		
 		}
 	}
+	printf("Не найденна секция %s или переменная %s",section_name,variable_name);
 	return NULL;
 }
