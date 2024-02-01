@@ -41,11 +41,11 @@ char rtrim(char *buffer){
 	return 1;
 }
 
-config* ReadConfig(char *file_path) {
+section* ReadConfig(char *file_path) {
 
 	FILE *configFile = fopen(file_path, "r");
-	config *begin = NULL, *current = NULL;
-
+	section *begin = NULL, *current = NULL;
+	param *pbegin = NULL;
 	if(configFile == NULL) {
 		perror("Не удалось открыть файл конфигурации");
 		exit(1);
@@ -77,6 +77,18 @@ config* ReadConfig(char *file_path) {
 		//Смена секции
 		if(line[0] == '['){
 			free(sectionName);
+			//Чтение переменных секции 
+			if(begin == NULL) {
+				current = begin = (section*)calloc(1,sizeof(section));
+			}
+			else {
+				current->params = pbegin;
+				current = current->next = (section*)calloc(1,sizeof(section));			
+			}
+			if(current == NULL) {
+				perror("Не удалось выделить память");
+				exit(4);
+			}
 			sectionName = NULL;
 			sectionName = strdup(line);
 			if(sectionName == NULL){
@@ -94,24 +106,24 @@ config* ReadConfig(char *file_path) {
 			*c = ' ';
 			trim(sectionName);
 			rtrim(sectionName);
+			strcpy(current->sectionName,sectionName);
+			rtrim(current->sectionName);
 		}
 		else{
-			//Чтение переменных секции 
-			if(begin == NULL) {
-				current = begin = (config*)calloc(1,sizeof(config));
+			
+			
+			
+			if(current->params == NULL) {
+				pbegin = current->params = (param*)calloc(1,sizeof(param));
 			}
-
-			if(current == NULL) {
+			if(current->params == NULL) {
 				perror("Не удалось выделить память");
 				exit(4);
 			}
-
-			strcpy(current->sectionName,sectionName);
 			
-			strcpy(current->variableName,line);
+			strcpy(current->params->variableName,line);
 			
-			rtrim(current->sectionName);
-			rtrim(current->variableName);
+			rtrim(current->params->variableName);
 
 			char *varValuesLine = strtok(NULL,"~;");
 
@@ -142,9 +154,9 @@ config* ReadConfig(char *file_path) {
 				strcpy(vl->valueString,varValue);
 			}
 
-			current->variableValues = vl_begin;
+			current->params->variableValues = vl_begin;
 
-			current = current->next = (config*)calloc(1,sizeof(config));
+			current->params = current->params->next = (param*)calloc(1,sizeof(param));
 			
 			free(varValuesLine);
 		}

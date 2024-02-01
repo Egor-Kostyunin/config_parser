@@ -11,13 +11,18 @@ typedef struct  values_list_struct {
 	struct values_list_struct *next;
 } values_list;
 
-typedef struct config_struct {
-	char sectionName[MAX_SECTION_NAME_SIZE];
+typedef struct param_struct {
 	char variableName[MAX_VARIABLE_NAME_SIZE];
 	values_list *variableValues;
-	struct config_struct *next;
-} config;
+	struct param_struct *next;
+} param;
 
-config* ReadConfig(char *file_path);
-values_list* GetConfigValues(config *config_ptr, char *section_name, char *variable_name);
+typedef struct section_struct {
+	char sectionName[MAX_SECTION_NAME_SIZE];
+	param *params;
+	struct section_struct *next;
+} section;
+
+section* ReadConfig(char *file_path);
+values_list* GetConfigValues(section *config_ptr, char *section_name, char *variable_name);
 #endif
