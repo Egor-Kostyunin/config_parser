@@ -110,7 +110,10 @@ section* ReadConfig(char *file_path) {
 			rtrim(current->sectionName);
 		}
 		else{
-			
+			if(sectionName == NULL) {
+				puts("Неожиданная переменная вне секции");
+				return NULL;
+			}
 			
 			
 			if(current->params == NULL) {
